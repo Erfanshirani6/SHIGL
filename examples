@@ -197,3 +197,12 @@ python shigl.py test.shigl
 
 # 4. حالت دیباگ
 python shigl.py --debug
+---
+# اجرای مفسر
+python shigl.py
+
+# تست ساخت پروژه اندروید
+SHIGL> android create TestApp
+SHIGL> cd TestApp
+SHIGL> build apk
+SHIGL> run emulator
