@@ -303,3 +303,544 @@ while True:
 print("🔚 SHIGL terminated")
 ---
 python shigl.py2
+#!/usr/bin/env python3
+# ============================================
+# SHIGL v1.0-beta - Advanced Language Interpreter
+# ============================================
+
+import sys
+import re
+from datetime import datetime
+from typing import Any, Dict, List, Optional, Tuple
+
+# ============================================
+# بخش ۱: توکن‌ها (Tokenization)
+# ============================================
+
+class TokenType:
+    """انواع توکن‌های زبان"""
+    KEYWORD = 'KEYWORD'
+    IDENTIFIER = 'IDENTIFIER'
+    NUMBER = 'NUMBER'
+    STRING = 'STRING'
+    OPERATOR = 'OPERATOR'
+    COMMENT = 'COMMENT'
+    EOF = 'EOF'
+
+class Token:
+    """یک توکن شامل نوع، مقدار و موقعیت"""
+    def __init__(self, type_: str, value: Any, line: int, column: int):
+        self.type = type_
+        self.value = value
+        self.line = line
+        self.column = column
+    
+    def __repr__(self):
+        return f"Token({self.type}, '{self.value}', line={self.line})"
+
+class Lexer:
+    """تجزیه‌کننده واژگان - تبدیل کد به توکن"""
+    
+    KEYWORDS = {
+        'say', 'var', 'ask', 'if', 'else', 'elif', 'while', 'for',
+        'func', 'return', 'import', 'class', 'try', 'catch',
+        'true', 'false', 'null', 'and', 'or', 'not',
+        'time', 'vars', 'clear', 'help', 'exit'
+    }
+    
+    OPERATORS = {
+        '=', '==', '!=', '>', '<', '>=', '<=',
+        '+', '-', '*', '/', '%', '**'
+    }
+    
+    def __init__(self, code: str):
+        self.code = code
+        self.pos = 0
+        self.line = 1
+        self.column = 1
+        self.tokens = []
+    
+    def tokenize(self) -> List[Token]:
+        """تبدیل کل کد به لیست توکن‌ها"""
+        while self.pos < len(self.code):
+            char = self.code[self.pos]
+            
+            # ===== نادیده گرفتن فاصله‌ها =====
+            if char.isspace():
+                if char == '\n':
+                    self.line += 1
+                    self.column = 1
+                else:
+                    self.column += 1
+                self.pos += 1
+                continue
+            
+            # ===== کامنت‌ها =====
+            if char == '#':
+                self._read_comment()
+                continue
+            
+            # ===== اعداد =====
+            if char.isdigit() or (char == '.' and self._peek().isdigit()):
+                self.tokens.append(self._read_number())
+                continue
+            
+            # ===== رشته‌ها =====
+            if char in '"\'':
+                self.tokens.append(self._read_string())
+                continue
+            
+            # ===== عملگرها =====
+            if char in self.OPERATORS:
+                self.tokens.append(self._read_operator())
+                continue
+            
+            # ===== شناسه‌ها و کلمات کلیدی =====
+            if char.isalpha() or char == '_':
+                self.tokens.append(self._read_identifier())
+                continue
+            
+            # ===== کاراکتر ناشناخته =====
+            raise SyntaxError(f"کاراکتر ناشناخته در خط {self.line}, ستون {self.column}: '{char}'")
+        
+        self.tokens.append(Token(TokenType.EOF, 'EOF', self.line, self.column))
+        return self.tokens
+    
+    def _peek(self, offset: int = 1) -> str:
+        """نگاه به کاراکتر بعدی بدون حرکت"""
+        pos = self.pos + offset
+        return self.code[pos] if pos < len(self.code) else ''
+    
+    def _read_comment(self):
+        """خواندن کامنت تا انتهای خط"""
+        self.pos += 1
+        self.column += 1
+        while self.pos < len(self.code) and self.code[self.pos] != '\n':
+            self.pos += 1
+            self.column += 1
+    
+    def _read_number(self) -> Token:
+        """خواندن عدد (صحیح یا اعشاری)"""
+        num = ''
+        start_column = self.column
+        
+        while self.pos < len(self.code):
+            char = self.code[self.pos]
+            if char.isdigit() or char == '.':
+                num += char
+                self.pos += 1
+                self.column += 1
+            else:
+                break
+        
+        value = float(num) if '.' in num else int(num)
+        return Token(TokenType.NUMBER, value, self.line, start_column)
+    
+    def _read_string(self) -> Token:
+        """خواندن رشته با پشتیبانی از escape"""
+        quote = self.code[self.pos]
+        self.pos += 1
+        self.column += 1
+        
+        string = ''
+        start_column = self.column
+        
+        while self.pos < len(self.code):
+            char = self.code[self.pos]
+            
+            if char == '\\':  # escape
+                self.pos += 1
+                self.column += 1
+                if self.pos < len(self.code):
+                    esc = self.code[self.pos]
+                    if esc == 'n':
+                        string += '\n'
+                    elif esc == 't':
+                        string += '\t'
+                    else:
+                        string += esc
+                self.pos += 1
+                self.column += 1
+            elif char == quote:
+                self.pos += 1
+                self.column += 1
+                break
+            else:
+                string += char
+                self.pos += 1
+                self.column += 1
+        
+        return Token(TokenType.STRING, string, self.line, start_column)
+    
+    def _read_operator(self) -> Token:
+        """خواندن عملگر (تک یا دو کاراکتری)"""
+        start_column = self.column
+        op = self.code[self.pos]
+        self.pos += 1
+        self.column += 1
+        
+        # عملگرهای دو کاراکتری
+        if self.pos < len(self.code):
+            next_char = self.code[self.pos]
+            if op + next_char in self.OPERATORS:
+                op += next_char
+                self.pos += 1
+                self.column += 1
+        
+        return Token(TokenType.OPERATOR, op, self.line, start_column)
+    
+    def _read_identifier(self) -> Token:
+        """خواندن شناسه یا کلمه کلیدی"""
+        ident = ''
+        start_column = self.column
+        
+        while self.pos < len(self.code):
+            char = self.code[self.pos]
+            if char.isalnum() or char == '_':
+                ident += char
+                self.pos += 1
+                self.column += 1
+            else:
+                break
+        
+        token_type = TokenType.KEYWORD if ident in self.KEYWORDS else TokenType.IDENTIFIER
+        return Token(token_type, ident, self.line, start_column)
+
+# ============================================
+# بخش ۲: مفسر اصلی
+# ============================================
+
+class SHIGLInterpreter:
+    """مفسر اصلی SHIGL"""
+    
+    def __init__(self, debug: bool = False):
+        self.variables = {}
+        self.functions = {}
+        self.output_buffer = []
+        self.debug = debug
+        self.line_number = 0
+    
+    def execute_file(self, filename: str) -> bool:
+        """اجرای فایل .shigl"""
+        try:
+            with open(filename, 'r', encoding='utf-8') as f:
+                code = f.read()
+            return self.execute(code, filename=filename)
+        except FileNotFoundError:
+            print(f"❌ فایل {filename} پیدا نشد")
+            return False
+        except Exception as e:
+            print(f"❌ خطا در اجرای فایل: {e}")
+            return False
+    
+    def execute(self, code: str, filename: str = '<repl>') -> bool:
+        """اجرای کد SHIGL"""
+        try:
+            # مرحله ۱: توکن‌گذاری
+            lexer = Lexer(code)
+            tokens = lexer.tokenize()
+            
+            if self.debug:
+                print("🔍 توکن‌ها:")
+                for token in tokens[:-1]:  # به جز EOF
+                    print(f"  {token}")
+                print()
+            
+            # مرحله ۲: اجرای دستورات
+            i = 0
+            while i < len(tokens) - 1:  # به جز EOF
+                token = tokens[i]
+                
+                # دستورات
+                if token.type == TokenType.KEYWORD:
+                    result = self._execute_command(tokens, i)
+                    if result is not None:
+                        if isinstance(result, tuple) and len(result) == 2:
+                            # نتیجه و موقعیت جدید
+                            output, i = result
+                            if output is not None:
+                                print(output)
+                        else:
+                            # فقط نتیجه
+                            if result is not None:
+                                print(result)
+                            i += 1
+                    else:
+                        i += 1
+                else:
+                    i += 1
+            
+            return True
+            
+        except SyntaxError as e:
+            print(f"❌ خطای نحوی: {e}")
+            return False
+        except Exception as e:
+            print(f"❌ خطای اجرا: {e}")
+            if self.debug:
+                import traceback
+                traceback.print_exc()
+            return False
+    
+    def _execute_command(self, tokens: List[Token], pos: int) -> Optional[Any]:
+        """اجرای یک دستور"""
+        token = tokens[pos]
+        cmd = token.value
+        
+        if cmd == 'say':
+            return self._cmd_say(tokens, pos)
+        elif cmd == 'var':
+            return self._cmd_var(tokens, pos)
+        elif cmd == 'ask':
+            return self._cmd_ask(tokens, pos)
+        elif cmd == 'time':
+            return self._cmd_time(tokens, pos)
+        elif cmd == 'vars':
+            return self._cmd_vars(tokens, pos)
+        elif cmd == 'clear':
+            return self._cmd_clear(tokens, pos)
+        elif cmd == 'help':
+            return self._cmd_help(tokens, pos)
+        elif cmd in ['add', 'sub', 'mul', 'div']:
+            return self._cmd_math(tokens, pos, cmd)
+        elif cmd == 'if':
+            return self._cmd_if(tokens, pos)
+        elif cmd == 'exit':
+            sys.exit(0)
+        else:
+            return f"❌ دستور ناشناخته: {cmd}"
+    
+    def _get_value(self, token: Token) -> Any:
+        """دریافت مقدار از توکن"""
+        if token.type == TokenType.NUMBER:
+            return token.value
+        elif token.type == TokenType.STRING:
+            return token.value
+        elif token.type == TokenType.IDENTIFIER:
+            return self.variables.get(token.value, token.value)
+        elif token.type == TokenType.KEYWORD:
+            if token.value == 'true': return True
+            if token.value == 'false': return False
+            if token.value == 'null': return None
+        return token.value
+    
+    def _cmd_say(self, tokens: List[Token], pos: int) -> Optional[str]:
+        """دستور say"""
+        if pos + 1 >= len(tokens):
+            return "❌ say نیاز به یک مقدار دارد"
+        
+        value_token = tokens[pos + 1]
+        value = self._get_value(value_token)
+        return str(value)
+    
+    def _cmd_var(self, tokens: List[Token], pos: int) -> Optional[str]:
+        """دستور var"""
+        if pos + 3 >= len(tokens):
+            return "❌ فرمت: var name = value"
+        
+        name_token = tokens[pos + 1]
+        if name_token.type != TokenType.IDENTIFIER:
+            return f"❌ نام متغیر نامعتبر: {name_token.value}"
+        
+        if tokens[pos + 2].value != '=':
+            return "❌ انتظار '=' بود"
+        
+        value_token = tokens[pos + 3]
+        value = self._get_value(value_token)
+        
+        self.variables[name_token.value] = value
+        return f"✅ {name_token.value} = {value}"
+    
+    def _cmd_ask(self, tokens: List[Token], pos: int) -> Optional[str]:
+        """دستور ask"""
+        if pos + 1 >= len(tokens):
+            return "❌ ask نیاز به نام متغیر دارد"
+        
+        var_name = tokens[pos + 1].value
+        user_input = input(f"{var_name}: ")
+        
+        # تبدیل خودکار
+        if user_input.isdigit():
+            user_input = int(user_input)
+        elif user_input.replace('.', '').isdigit():
+            user_input = float(user_input)
+        elif user_input.lower() == 'true':
+            user_input = True
+        elif user_input.lower() == 'false':
+            user_input = False
+        elif user_input.lower() == 'null':
+            user_input = None
+        
+        self.variables[var_name] = user_input
+        return f"✅ {var_name} = {user_input}"
+    
+    def _cmd_time(self, tokens: List[Token], pos: int) -> str:
+        """دستور time"""
+        now = datetime.now()
+        return now.strftime("%Y-%m-%d %H:%M:%S")
+    
+    def _cmd_vars(self, tokens: List[Token], pos: int) -> str:
+        """دستور vars - نمایش متغیرها"""
+        if not self.variables:
+            return "📦 هیچ متغیری تعریف نشده"
+        
+        result = "📦 متغیرهای تعریف‌شده:\n"
+        for name, value in self.variables.items():
+            result += f"  {name} = {value} ({type(value).__name__})\n"
+        return result.strip()
+    
+    def _cmd_clear(self, tokens: List[Token], pos: int) -> str:
+        """دستور clear"""
+        count = len(self.variables)
+        self.variables.clear()
+        return f"🧹 {count} متغیر پاک شد"
+    
+    def _cmd_help(self, tokens: List[Token], pos: int) -> str:
+        """دستور help"""
+        return """
+📚 راهنمای SHIGL v1.0
+
+دستورات پایه:
+  say "Hello"     - چاپ متن
+  say x           - چاپ مقدار متغیر
+  var x = 10      - تعریف متغیر
+  ask name        - دریافت ورودی از کاربر
+  time            - نمایش زمان فعلی
+
+عملیات ریاضی:
+  add x 5         - جمع
+  sub x 3         - تفریق
+  mul x 2         - ضرب
+  div x 4         - تقسیم
+
+شرط‌ها:
+  if x == 5       - بررسی برابری
+  if x > 10       - بررسی بزرگ‌تر
+
+مدیریت:
+  vars            - نمایش همه متغیرها
+  clear           - پاک کردن متغیرها
+  help            - نمایش این راهنما
+  exit            - خروج از برنامه
+
+پیشرفته:
+  # کامنت‌ها     - نوشتن توضیحات
+  true/false      - مقادیر بولین
+  null           - مقدار خالی
+  "Hello\nWorld" - رشته با escape
+        """
+    
+    def _cmd_math(self, tokens: List[Token], pos: int, op: str) -> Optional[str]:
+        """دستورات ریاضی"""
+        if pos + 2 >= len(tokens):
+            return f"❌ {op} نیاز به دو مقدار دارد"
+        
+        a = self._get_value(tokens[pos + 1])
+        b = self._get_value(tokens[pos + 2])
+        
+        # تبدیل به عدد
+        try:
+            a = float(a) if not isinstance(a, (int, float)) else a
+            b = float(b) if not isinstance(b, (int, float)) else b
+        except:
+            return f"❌ عملوندها باید عدد باشند: {a}, {b}"
+        
+        if not isinstance(a, (int, float)) or not isinstance(b, (int, float)):
+            return f"❌ عملوندها باید عدد باشند: {a}, {b}"
+        
+        operations = {
+            'add': a + b,
+            'sub': a - b,
+            'mul': a * b,
+            'div': a / b if b != 0 else None
+        }
+        
+        result = operations.get(op)
+        if result is None:
+            return "❌ تقسیم بر صفر!"
+        
+        return f"📊 {a} {op} {b} = {result}"
+    
+    def _cmd_if(self, tokens: List[Token], pos: int) -> Optional[str]:
+        """دستور if (فقط مقایسه)"""
+        if pos + 3 >= len(tokens):
+            return "❌ فرمت: if a == b"
+        
+        a = self._get_value(tokens[pos + 1])
+        op = tokens[pos + 2].value
+        b = self._get_value(tokens[pos + 3])
+        
+        # مقایسه
+        if op == '==':
+            result = str(a) == str(b)
+        elif op == '!=':
+            result = str(a) != str(b)
+        elif op == '>':
+            result = float(a) > float(b)
+        elif op == '<':
+            result = float(a) < float(b)
+        elif op == '>=':
+            result = float(a) >= float(b)
+        elif op == '<=':
+            result = float(a) <= float(b)
+        else:
+            return f"❌ عملگر نامشخص: {op}"
+        
+        return f"📊 شرط: {result}"
+
+# ============================================
+# بخش ۳: حلقه اصلی (REPL و اجرای فایل)
+# ============================================
+
+def main():
+    """ورودی اصلی برنامه"""
+    import argparse
+    
+    parser = argparse.ArgumentParser(description='SHIGL Programming Language')
+    parser.add_argument('file', nargs='?', help='فایل .shigl برای اجرا')
+    parser.add_argument('--debug', action='store_true', help='حالت دیباگ')
+    parser.add_argument('--version', action='version', version='SHIGL v1.0-beta')
+    
+    args = parser.parse_args()
+    
+    interpreter = SHIGLInterpreter(debug=args.debug)
+    
+    # اجرای فایل
+    if args.file:
+        if not args.file.endswith('.shigl'):
+            print("⚠️  فایل باید پسوند .shigl داشته باشد")
+        interpreter.execute_file(args.file)
+        return
+    
+    # حالت REPL
+    print("=" * 60)
+    print("🚀 SHIGL v1.0-beta - Advanced Language Interpreter")
+    print("📝 برای راهنما 'help' را تایپ کنید")
+    print("=" * 60)
+    
+    while True:
+        try:
+            code = input("\nSHIGL> ").strip()
+            if not code:
+                continue
+            
+            if code == 'exit':
+                print("👋 Goodbye!")
+                break
+            
+            interpreter.execute(code)
+            
+        except KeyboardInterrupt:
+            print("\n👋 Goodbye!")
+            break
+        except EOFError:
+            print("\n👋 Goodbye!")
+            break
+        except Exception as e:
+            print(f"❌ خطای غیرمنتظره: {e}")
+            if args.debug:
+                import traceback
+                traceback.print_exc()
+
+if __name__ == "__main__":
+    main()
