@@ -182,3 +182,18 @@ help
 
 # تست 8: خروج
 exit
+---
+# 1. اجرای REPL
+python shigl.py
+
+# 2. تست دستورات جدید
+SHIGL> # این یک کامنت است
+SHIGL> var name = "SHIGL"
+SHIGL> say "Hello\nWorld"  # نمایش در دو خط
+
+# 3. اجرای فایل
+echo 'say "Hello from file"' > test.shigl
+python shigl.py test.shigl
+
+# 4. حالت دیباگ
+python shigl.py --debug
