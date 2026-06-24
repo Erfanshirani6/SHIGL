@@ -301,3 +301,5 @@ while True:
         print(f"❌ خطای غیرمنتظره: {e}")
 
 print("🔚 SHIGL terminated")
+---
+python shigl.py2
