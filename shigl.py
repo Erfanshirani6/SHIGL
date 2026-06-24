@@ -148,4 +148,17 @@ while True:
         print("دستور ناشناخته")
         ---
         SHIGL> ask name
-    
+    while True:
+
+    code = input("SHIGL> ")
+
+    if code == "exit":
+        break
+
+    elif code.startswith("say "):
+        ...
+
+    elif code.startswith("ask "):
+        name = code[4:].strip()
+        value = input(name + ": ")
+        variables[name] = value
