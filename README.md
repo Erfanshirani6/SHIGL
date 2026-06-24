@@ -201,3 +201,4 @@ The journey starts with a single command:
 ```shigl
 say "Hello SHIGL"
 ```
+Current Version: 0.1 Alpha
