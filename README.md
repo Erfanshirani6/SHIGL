@@ -202,3 +202,9 @@ The journey starts with a single command:
 say "Hello SHIGL"
 ```
 Current Version: 0.1 Alpha
+SHIGL 0.2
+---------
+✓ var
+✓ say variable
+var name = "Erfan"
+say name
