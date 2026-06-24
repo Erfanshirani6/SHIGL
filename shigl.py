@@ -1,66 +1,9 @@
-print("SHIGL Started")
-
-while True:
-    code = input("SHIGL> ")
-
-    if code == "exit":
-        break
-
-    elif code.startswith("say "):
-        print(code[4:].replace('"', ''))
-
-    else:
-        print("دستور ناشناخته")
-___
-print("SHIGL Started")
-
-while True:
-    code = input("SHIGL> ")
-
-    if code == "exit":
-        break
-
-    elif code.startswith("say "):
-        print(code[4:].replace('"', ''))
-
-    else:
-        print("دستور ناشناخته")
-___
-print("SHIGL v0.2 Started")
+print("SHIGL v0.4 Started 🚀")
 
 variables = {}
 
 while True:
-    code = input("SHIGL> ")
 
-    if code == "exit":
-        break
-
-    elif code.startswith("var "):
-        try:
-            left, right = code[4:].split("=")
-            name = left.strip()
-            value = right.strip().replace('"', '')
-            variables[name] = value
-        except:
-            print("خطا در متغیر")
-
-    elif code.startswith("say "):
-        text = code[4:].strip()
-
-        if text in variables:
-            print(variables[text])
-        else:
-            print(text.replace('"', ''))
-
-    else:
-        print("دستور ناشناخته")
-___
-print("SHIGL v0.3 Started")
-
-variables = {}
-
-while True:
     code = input("SHIGL> ")
 
     if code == "exit":
@@ -68,8 +11,10 @@ while True:
 
     # متغیر
     elif code.startswith("var "):
+
         try:
             left, right = code[4:].split("=")
+
             name = left.strip()
             value = right.strip().replace('"', '')
 
@@ -83,73 +28,118 @@ while True:
 
     # چاپ
     elif code.startswith("say "):
+
         text = code[4:].strip()
 
         if text in variables:
             print(variables[text])
         else:
-            print(text.replace('"', ''))
+            print(text)
+
+    # جمع
+    elif code.startswith("add "):
+
+        try:
+            _, a, b = code.split()
+
+            if a in variables:
+                a = variables[a]
+
+            if b in variables:
+                b = variables[b]
+
+            print(int(a) + int(b))
+
+        except:
+            print("خطا در add")
+
+    # تفریق
+    elif code.startswith("sub "):
+
+        try:
+            _, a, b = code.split()
+
+            if a in variables:
+                a = variables[a]
+
+            if b in variables:
+                b = variables[b]
+
+            print(int(a) - int(b))
+
+        except:
+            print("خطا در sub")
+
+    # ضرب
+    elif code.startswith("mul "):
+
+        try:
+            _, a, b = code.split()
+
+            if a in variables:
+                a = variables[a]
+
+            if b in variables:
+                b = variables[b]
+
+            print(int(a) * int(b))
+
+        except:
+            print("خطا در mul")
+
+    # تقسیم
+    elif code.startswith("div "):
+
+        try:
+            _, a, b = code.split()
+
+            if a in variables:
+                a = variables[a]
+
+            if b in variables:
+                b = variables[b]
+
+            print(int(a) / int(b))
+
+        except:
+            print("خطا در div")
 
     # شرط
     elif code.startswith("if "):
 
-        condition = code[3:]
-
         try:
 
-            if ">" in condition:
+            condition = code[3:]
 
-                left, right = condition.split(">")
+            if "==" in condition:
 
-                left = left.strip()
-                right = right.strip()
+                a, b = condition.split("==")
 
-                if left in variables:
-                    left = variables[left]
+                a = a.strip()
+                b = b.strip()
 
-                if right in variables:
-                    right = variables[right]
+                if a in variables:
+                    a = variables[a]
 
-                if int(left) > int(right):
-                    print("TRUE")
-                else:
-                    print("FALSE")
+                if b in variables:
+                    b = variables[b]
 
-            elif "<" in condition:
+                print(str(a) == str(b))
 
-                left, right = condition.split("<")
+            elif "!=" in condition:
 
-                left = left.strip()
-                right = right.strip()
+                a, b = condition.split("!=")
 
-                if left in variables:
-                    left = variables[left]
+                a = a.strip()
+                b = b.strip()
 
-                if right in variables:
-                    right = variables[right]
+                if a in variables:
+                    a = variables[a]
 
-                if int(left) < int(right):
-                    print("TRUE")
-                else:
-                    print("FALSE")
+                if b in variables:
+                    b = variables[b]
 
-            elif "==" in condition:
-
-                left, right = condition.split("==")
-
-                left = left.strip()
-                right = right.strip()
-
-                if left in variables:
-                    left = variables[left]
-
-                if right in variables:
-                    right = variables[right]
-
-                if str(left) == str(right):
-                    print("TRUE")
-                else:
-                    print("FALSE")
+                print(str(a) != str(b))
 
         except:
             print("خطا در شرط")
