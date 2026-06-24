@@ -1,1 +1,151 @@
+🚀 SHIGL ROADMAP
 
+Version 0.1
+------------
+✓ say "text"
+✓ exit
+
+مثال:
+say "سلام دنیا"
+
+هدف:
+اولین مفسر SHIGL
+
+
+Version 0.2
+------------
+✓ var
+✓ say variable
+
+مثال:
+var name = "Erfan"
+say name
+
+هدف:
+افزودن متغیرها
+
+
+Version 0.3
+------------
+✓ if
+✓ >
+✓ <
+
+مثال:
+var score = 20
+
+if score > 10
+
+هدف:
+تصمیم‌گیری
+
+
+Version 0.4
+------------
+✓ ==
+✓ !=
+✓ add
+✓ int
+
+مثال:
+if score == 20
+
+add 5 10
+
+هدف:
+منطق و ریاضیات
+
+
+Version 0.5
+------------
+✓ ask
+✓ rand
+✓ time
+✓ loop
+
+مثال:
+ask name
+
+rand 1 100
+
+time
+
+loop 5 say hello
+
+هدف:
+تعامل با کاربر
+
+
+Version 0.6
+------------
+✓ func
+✓ return
+✓ پارامتر
+
+مثال:
+func hello
+    say "سلام"
+end
+
+hello
+
+هدف:
+توابع
+
+
+Version 0.7
+------------
+✓ فایل .shigl
+✓ اجرای اسکریپت
+
+مثال:
+run hello.shigl
+
+هدف:
+اجرای برنامه‌های واقعی
+
+
+Version 0.8
+------------
+✓ لیست
+✓ دیکشنری
+✓ حلقه foreach
+
+مثال:
+list users
+
+هدف:
+ساختمان داده‌ها
+
+
+Version 0.9
+------------
+✓ import
+✓ module
+✓ package manager
+
+مثال:
+import math
+
+هدف:
+کتابخانه‌ها
+
+
+Version 1.0
+------------
+✓ Compiler
+✓ Bytecode
+✓ Virtual Machine
+✓ Multi Thread
+✓ GUI
+✓ Network
+✓ Database
+✓ AI Library
+
+مثال:
+window "SHIGL"
+
+button "شروع"
+
+هدف:
+اولین نسخه رسمی SHIGL
