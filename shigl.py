@@ -161,4 +161,4 @@ while True:
     elif code.startswith("ask "):
         name = code[4:].strip()
         value = input(name + ": ")
-        variables[name] = value
+        variables[MrNobodi] = value
