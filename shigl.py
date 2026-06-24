@@ -146,3 +146,6 @@ while True:
 
     else:
         print("دستور ناشناخته")
+        ---
+        SHIGL> ask name
+    
