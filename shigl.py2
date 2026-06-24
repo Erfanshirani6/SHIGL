@@ -1,0 +1,303 @@
+# ============================================
+# SHIGL v0.4.1 - تصحیح باگ‌ها
+# ============================================
+
+print("🔧 SHIGL v0.4.1 Started (Bugfix Edition)")
+
+variables = {}
+
+while True:
+    try:
+        code = input("SHIGL> ").strip()
+        
+        if not code:
+            continue
+            
+        # ============ خروج ============
+        if code == "exit":
+            print("👋 Goodbye!")
+            break
+        
+        # ============ متغیر ============
+        elif code.startswith("var "):
+            try:
+                # حذف فاصله‌های اضافی
+                parts = code[4:].split("=")
+                if len(parts) != 2:
+                    print("❌ فرمت: var name = value")
+                    continue
+                    
+                name = parts[0].strip()
+                value = parts[1].strip()
+                
+                # حذف گیومه‌ها
+                if value.startswith('"') and value.endswith('"'):
+                    value = value[1:-1]
+                elif value.isdigit():
+                    value = int(value)
+                elif value.replace('.', '').isdigit():
+                    value = float(value)
+                elif value.lower() == 'true':
+                    value = True
+                elif value.lower() == 'false':
+                    value = False
+                elif value.lower() == 'null':
+                    value = None
+                
+                variables[name] = value
+                print(f"✅ {name} = {value}")
+                
+            except Exception as e:
+                print(f"❌ خطا در متغیر: {e}")
+        
+        # ============ چاپ ============
+        elif code.startswith("say "):
+            try:
+                text = code[4:].strip()
+                
+                # حذف گیومه‌های اضافی
+                if text.startswith('"') and text.endswith('"'):
+                    text = text[1:-1]
+                
+                # بررسی متغیر
+                if text in variables:
+                    print(variables[text])
+                else:
+                    print(text)
+            except Exception as e:
+                print(f"❌ خطا در say: {e}")
+        
+        # ============ ورودی ============
+        elif code.startswith("ask "):
+            try:
+                var_name = code[4:].strip()
+                if not var_name:
+                    print("❌ نام متغیر را وارد کنید")
+                    continue
+                    
+                value = input(f"{var_name}: ")
+                
+                # تبدیل خودکار
+                if value.isdigit():
+                    value = int(value)
+                elif value.replace('.', '').isdigit():
+                    value = float(value)
+                elif value.lower() == 'true':
+                    value = True
+                elif value.lower() == 'false':
+                    value = False
+                
+                variables[var_name] = value
+                print(f"✅ {var_name} = {value}")
+                
+            except Exception as e:
+                print(f"❌ خطا در ask: {e}")
+        
+        # ============ زمان ============
+        elif code == "time":
+            try:
+                from datetime import datetime
+                print(datetime.now().strftime("%Y-%m-%d %H:%M:%S"))
+            except Exception as e:
+                print(f"❌ خطا در time: {e}")
+        
+        # ============ جمع ============
+        elif code.startswith("add "):
+            try:
+                parts = code[4:].split()
+                if len(parts) != 2:
+                    print("❌ فرمت: add a b")
+                    continue
+                
+                a = variables.get(parts[0], parts[0])
+                b = variables.get(parts[1], parts[1])
+                
+                # تبدیل به عدد
+                a = float(a) if isinstance(a, (int, float)) or str(a).replace('.', '').isdigit() else a
+                b = float(b) if isinstance(b, (int, float)) or str(b).replace('.', '').isdigit() else b
+                
+                if isinstance(a, (int, float)) and isinstance(b, (int, float)):
+                    result = a + b
+                    print(f"📊 {a} + {b} = {result}")
+                else:
+                    print(f"❌ عملوندها باید عدد باشند: {a}, {b}")
+                    
+            except Exception as e:
+                print(f"❌ خطا در add: {e}")
+        
+        # ============ تفریق ============
+        elif code.startswith("sub "):
+            try:
+                parts = code[4:].split()
+                if len(parts) != 2:
+                    print("❌ فرمت: sub a b")
+                    continue
+                
+                a = variables.get(parts[0], parts[0])
+                b = variables.get(parts[1], parts[1])
+                
+                a = float(a) if isinstance(a, (int, float)) or str(a).replace('.', '').isdigit() else a
+                b = float(b) if isinstance(b, (int, float)) or str(b).replace('.', '').isdigit() else b
+                
+                if isinstance(a, (int, float)) and isinstance(b, (int, float)):
+                    result = a - b
+                    print(f"📊 {a} - {b} = {result}")
+                else:
+                    print(f"❌ عملوندها باید عدد باشند: {a}, {b}")
+                    
+            except Exception as e:
+                print(f"❌ خطا در sub: {e}")
+        
+        # ============ ضرب ============
+        elif code.startswith("mul "):
+            try:
+                parts = code[4:].split()
+                if len(parts) != 2:
+                    print("❌ فرمت: mul a b")
+                    continue
+                
+                a = variables.get(parts[0], parts[0])
+                b = variables.get(parts[1], parts[1])
+                
+                a = float(a) if isinstance(a, (int, float)) or str(a).replace('.', '').isdigit() else a
+                b = float(b) if isinstance(b, (int, float)) or str(b).replace('.', '').isdigit() else b
+                
+                if isinstance(a, (int, float)) and isinstance(b, (int, float)):
+                    result = a * b
+                    print(f"📊 {a} × {b} = {result}")
+                else:
+                    print(f"❌ عملوندها باید عدد باشند: {a}, {b}")
+                    
+            except Exception as e:
+                print(f"❌ خطا در mul: {e}")
+        
+        # ============ تقسیم ============
+        elif code.startswith("div "):
+            try:
+                parts = code[4:].split()
+                if len(parts) != 2:
+                    print("❌ فرمت: div a b")
+                    continue
+                
+                a = variables.get(parts[0], parts[0])
+                b = variables.get(parts[1], parts[1])
+                
+                a = float(a) if isinstance(a, (int, float)) or str(a).replace('.', '').isdigit() else a
+                b = float(b) if isinstance(b, (int, float)) or str(b).replace('.', '').isdigit() else b
+                
+                if isinstance(a, (int, float)) and isinstance(b, (int, float)):
+                    if b == 0:
+                        print("❌ تقسیم بر صفر!")
+                    else:
+                        result = a / b
+                        print(f"📊 {a} ÷ {b} = {result}")
+                else:
+                    print(f"❌ عملوندها باید عدد باشند: {a}, {b}")
+                    
+            except Exception as e:
+                print(f"❌ خطا در div: {e}")
+        
+        # ============ شرط ============
+        elif code.startswith("if "):
+            try:
+                condition = code[3:].strip()
+                result = False
+                
+                # عملگرهای مقایسه
+                if "==" in condition:
+                    a, b = condition.split("==")
+                    a = a.strip()
+                    b = b.strip()
+                    
+                    # دریافت مقادیر
+                    a_val = variables.get(a, a)
+                    b_val = variables.get(b, b)
+                    result = str(a_val) == str(b_val)
+                    
+                elif "!=" in condition:
+                    a, b = condition.split("!=")
+                    a = a.strip()
+                    b = b.strip()
+                    
+                    a_val = variables.get(a, a)
+                    b_val = variables.get(b, b)
+                    result = str(a_val) != str(b_val)
+                    
+                elif ">" in condition:
+                    a, b = condition.split(">")
+                    a = a.strip()
+                    b = b.strip()
+                    
+                    a_val = float(variables.get(a, a))
+                    b_val = float(variables.get(b, b))
+                    result = a_val > b_val
+                    
+                elif "<" in condition:
+                    a, b = condition.split("<")
+                    a = a.strip()
+                    b = b.strip()
+                    
+                    a_val = float(variables.get(a, a))
+                    b_val = float(variables.get(b, b))
+                    result = a_val < b_val
+                
+                print(f"📊 شرط: {result}")
+                
+            except Exception as e:
+                print(f"❌ خطا در شرط: {e}")
+        
+        # ============ نمایش متغیرها ============
+        elif code == "vars":
+            if variables:
+                print("📦 متغیرهای تعریف‌شده:")
+                for name, value in variables.items():
+                    print(f"  {name} = {value} ({type(value).__name__})")
+            else:
+                print("📦 هیچ متغیری تعریف نشده")
+        
+        # ============ پاک کردن ============
+        elif code == "clear":
+            variables.clear()
+            print("🧹 همه متغیرها پاک شدند")
+        
+        # ============ راهنما ============
+        elif code == "help":
+            print("""
+📚 راهنمای SHIGL v0.4.1
+
+دستورات پایه:
+  say "Hello"     - چاپ متن
+  say x           - چاپ مقدار متغیر
+  var x = 10      - تعریف متغیر
+  ask name        - دریافت ورودی از کاربر
+  time            - نمایش زمان فعلی
+
+عملیات ریاضی:
+  add x 5         - جمع
+  sub x 3         - تفریق
+  mul x 2         - ضرب
+  div x 4         - تقسیم
+
+شرط‌ها:
+  if x == 5       - بررسی برابری
+  if x > 10       - بررسی بزرگ‌تر
+
+مدیریت:
+  vars            - نمایش همه متغیرها
+  clear           - پاک کردن متغیرها
+  exit            - خروج از برنامه
+  help            - نمایش این راهنما
+            """)
+        
+        # ============ دستور ناشناخته ============
+        else:
+            print(f"❌ دستور ناشناخته: {code}")
+            print("💡 برای راهنما 'help' را تایپ کنید")
+    
+    except KeyboardInterrupt:
+        print("\n👋 خروج")
+        break
+    except Exception as e:
+        print(f"❌ خطای غیرمنتظره: {e}")
+
+print("🔚 SHIGL terminated")
