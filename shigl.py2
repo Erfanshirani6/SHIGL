@@ -844,3 +844,568 @@ def main():
 
 if __name__ == "__main__":
     main()
+# ============================================
+# ادامه کد قبلی - اضافه کردن به کلاس SHIGLInterpreter
+# ============================================
+
+class SHIGLInterpreter:
+    # ... کدهای قبلی ...
+    
+    def _execute_command(self, tokens: List[Token], pos: int) -> Optional[Any]:
+        """اجرای یک دستور - توسعه‌یافته برای اندروید"""
+        token = tokens[pos]
+        cmd = token.value
+        
+        # دستورات قبلی
+        if cmd == 'say':
+            return self._cmd_say(tokens, pos)
+        elif cmd == 'var':
+            return self._cmd_var(tokens, pos)
+        elif cmd == 'ask':
+            return self._cmd_ask(tokens, pos)
+        elif cmd == 'time':
+            return self._cmd_time(tokens, pos)
+        elif cmd == 'vars':
+            return self._cmd_vars(tokens, pos)
+        elif cmd == 'clear':
+            return self._cmd_clear(tokens, pos)
+        elif cmd == 'help':
+            return self._cmd_help(tokens, pos)
+        elif cmd in ['add', 'sub', 'mul', 'div']:
+            return self._cmd_math(tokens, pos, cmd)
+        elif cmd == 'if':
+            return self._cmd_if(tokens, pos)
+        
+        # ============ دستورات جدید اندروید ============
+        elif cmd == 'android':
+            return self._cmd_android(tokens, pos)
+        elif cmd == 'build':
+            return self._cmd_build(tokens, pos)
+        elif cmd == 'run':
+            return self._cmd_run(tokens, pos)
+        elif cmd == 'activity':
+            return self._cmd_activity(tokens, pos)
+        elif cmd == 'resource':
+            return self._cmd_resource(tokens, pos)
+        elif cmd == 'manifest':
+            return self._cmd_manifest(tokens, pos)
+        
+        elif cmd == 'exit':
+            sys.exit(0)
+        else:
+            return f"❌ دستور ناشناخته: {cmd}"
+    
+    # ============================================
+    # دستورات اندروید
+    # ============================================
+    
+    def _cmd_android(self, tokens: List[Token], pos: int) -> str:
+        """ایجاد پروژه جدید اندروید"""
+        if pos + 1 >= len(tokens):
+            return "❌ فرمت: android create <project_name>"
+        
+        project_name = tokens[pos + 1].value
+        
+        # ایجاد ساختار پروژه
+        import os
+        import shutil
+        
+        # مسیر پروژه
+        project_path = os.path.join(os.getcwd(), project_name)
+        
+        if os.path.exists(project_path):
+            return f"❌ پوشه {project_name} از قبل وجود دارد"
+        
+        # ایجاد پوشه‌ها
+        os.makedirs(os.path.join(project_path, 'app', 'src', 'main', 'java', 'com', 'example', project_name.lower()))
+        os.makedirs(os.path.join(project_path, 'app', 'src', 'main', 'res', 'layout'))
+        os.makedirs(os.path.join(project_path, 'app', 'src', 'main', 'res', 'values'))
+        os.makedirs(os.path.join(project_path, 'app', 'src', 'main', 'res', 'drawable'))
+        
+        # ایجاد فایل‌های اصلی
+        self._create_android_files(project_path, project_name)
+        
+        return f"""
+✅ پروژه اندروید {project_name} با موفقیت ایجاد شد!
+
+📁 مسیر: {project_path}
+
+ساختار پروژه:
+  app/
+    src/main/
+      java/com/example/{project_name.lower()}/
+        MainActivity.java
+      res/
+        layout/
+          activity_main.xml
+        values/
+          strings.xml
+      AndroidManifest.xml
+  build.gradle
+  settings.gradle
+
+🔧 مراحل بعدی:
+  1. cd {project_name}
+  2. شبیه‌سازی با: run emulator
+  3. ساخت APK با: build apk
+  4. نصب روی دستگاه: run device
+        """
+    
+    def _create_android_files(self, project_path: str, project_name: str):
+        """ایجاد فایل‌های اصلی پروژه اندروید"""
+        import os
+        
+        package_name = f"com.example.{project_name.lower()}"
+        
+        # 1. MainActivity.java
+        main_activity = f'''package {package_name};
+
+import android.os.Bundle;
+import android.widget.TextView;
+import androidx.appcompat.app.AppCompatActivity;
+
+public class MainActivity extends AppCompatActivity {{
+    @Override
+    protected void onCreate(Bundle savedInstanceState) {{
+        super.onCreate(savedInstanceState);
+        setContentView(R.layout.activity_main);
+        
+        TextView textView = findViewById(R.id.textView);
+        textView.setText("Hello from SHIGL!");
+    }}
+}}
+'''
+        activity_path = os.path.join(project_path, 'app', 'src', 'main', 'java', 'com', 'example', project_name.lower(), 'MainActivity.java')
+        with open(activity_path, 'w') as f:
+            f.write(main_activity)
+        
+        # 2. activity_main.xml
+        layout_xml = '''<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:orientation="vertical"
+    android:gravity="center"
+    android:padding="16dp">
+
+    <TextView
+        android:id="@+id/textView"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="Hello World!"
+        android:textSize="24sp"
+        android:textColor="#FF6200EE" />
+
+</LinearLayout>
+'''
+        layout_path = os.path.join(project_path, 'app', 'src', 'main', 'res', 'layout', 'activity_main.xml')
+        with open(layout_path, 'w') as f:
+            f.write(layout_xml)
+        
+        # 3. strings.xml
+        strings_xml = f'''<resources>
+    <string name="app_name">{project_name}</string>
+</resources>
+'''
+        strings_path = os.path.join(project_path, 'app', 'src', 'main', 'res', 'values', 'strings.xml')
+        with open(strings_path, 'w') as f:
+            f.write(strings_xml)
+        
+        # 4. AndroidManifest.xml
+        manifest_xml = f'''<?xml version="1.0" encoding="utf-8"?>
+<manifest xmlns:android="http://schemas.android.com/apk/res/android"
+    package="{package_name}">
+
+    <application
+        android:allowBackup="true"
+        android:icon="@mipmap/ic_launcher"
+        android:label="@string/app_name"
+        android:theme="@style/Theme.AppCompat.Light">
+        <activity
+            android:name=".MainActivity"
+            android:exported="true">
+            <intent-filter>
+                <action android:name="android.intent.action.MAIN" />
+                <category android:name="android.intent.category.LAUNCHER" />
+            </intent-filter>
+        </activity>
+    </application>
+
+</manifest>
+'''
+        manifest_path = os.path.join(project_path, 'app', 'src', 'main', 'AndroidManifest.xml')
+        with open(manifest_path, 'w') as f:
+            f.write(manifest_xml)
+        
+        # 5. build.gradle (app)
+        build_gradle = '''plugins {
+    id 'com.android.application'
+}
+
+android {
+    compileSdk 34
+
+    defaultConfig {
+        applicationId "''' + package_name + '''"
+        minSdk 21
+        targetSdk 34
+        versionCode 1
+        versionName "1.0"
+    }
+
+    buildTypes {
+        release {
+            minifyEnabled false
+            proguardFiles getDefaultProguardFile('proguard-android-optimize.txt'), 'proguard-rules.pro'
+        }
+    }
+}
+
+dependencies {
+    implementation 'androidx.appcompat:appcompat:1.6.1'
+    implementation 'com.google.android.material:material:1.9.0'
+}
+'''
+        build_path = os.path.join(project_path, 'app', 'build.gradle')
+        with open(build_path, 'w') as f:
+            f.write(build_gradle)
+        
+        # 6. settings.gradle
+        settings_gradle = '''pluginManagement {
+    repositories {
+        google()
+        mavenCentral()
+        gradlePluginPortal()
+    }
+}
+dependencyResolutionManagement {
+    repositories {
+        google()
+        mavenCentral()
+    }
+}
+rootProject.name = "''' + project_name + '''"
+include ':app'
+'''
+        settings_path = os.path.join(project_path, 'settings.gradle')
+        with open(settings_path, 'w') as f:
+            f.write(settings_gradle)
+    
+    def _cmd_build(self, tokens: List[Token], pos: int) -> str:
+        """ساخت APK"""
+        if pos + 1 >= len(tokens):
+            return "❌ فرمت: build <apk|aab> [project_path]"
+        
+        build_type = tokens[pos + 1].value
+        
+        # دریافت مسیر پروژه
+        if pos + 2 < len(tokens):
+            project_path = tokens[pos + 2].value
+        else:
+            project_path = os.getcwd()
+        
+        import subprocess
+        import os
+        
+        if not os.path.exists(os.path.join(project_path, 'app')):
+            return f"❌ پروژه اندروید در {project_path} پیدا نشد"
+        
+        try:
+            # اجرای Gradle
+            os.chdir(project_path)
+            
+            if build_type == 'apk':
+                print("🔨 در حال ساخت APK...")
+                result = subprocess.run(['./gradlew', 'assembleDebug'], 
+                                       capture_output=True, text=True, cwd=project_path)
+                
+                if result.returncode == 0:
+                    apk_path = os.path.join(project_path, 'app', 'build', 'outputs', 'apk', 'debug', 'app-debug.apk')
+                    return f"""
+✅ APK با موفقیت ساخته شد!
+
+📱 مسیر APK: {apk_path}
+📦 حجم: {os.path.getsize(apk_path) / 1024 / 1024:.2f} MB
+
+🔧 نصب روی دستگاه:
+  run device {project_path}
+  
+🌐 اجرا روی شبیه‌ساز:
+  run emulator {project_path}
+"""
+                else:
+                    return f"❌ خطا در ساخت APK:\n{result.stderr}"
+            
+            elif build_type == 'aab':
+                print("🔨 در حال ساخت AAB...")
+                result = subprocess.run(['./gradlew', 'bundleDebug'], 
+                                       capture_output=True, text=True, cwd=project_path)
+                
+                if result.returncode == 0:
+                    aab_path = os.path.join(project_path, 'app', 'build', 'outputs', 'bundle', 'debug', 'app-debug.aab')
+                    return f"""
+✅ AAB با موفقیت ساخته شد!
+
+📱 مسیر AAB: {aab_path}
+📦 حجم: {os.path.getsize(aab_path) / 1024 / 1024:.2f} MB
+
+📤 آپلود در Google Play Console
+"""
+                else:
+                    return f"❌ خطا در ساخت AAB:\n{result.stderr}"
+            
+            else:
+                return "❌ نوع ساخت نامشخص. استفاده: build apk یا build aab"
+                
+        except Exception as e:
+            return f"❌ خطا در ساخت: {e}"
+    
+    def _cmd_run(self, tokens: List[Token], pos: int) -> str:
+        """اجرای پروژه روی شبیه‌ساز یا دستگاه"""
+        if pos + 1 >= len(tokens):
+            return "❌ فرمت: run <emulator|device> [project_path]"
+        
+        run_target = tokens[pos + 1].value
+        
+        # دریافت مسیر پروژه
+        if pos + 2 < len(tokens):
+            project_path = tokens[pos + 2].value
+        else:
+            project_path = os.getcwd()
+        
+        import subprocess
+        import os
+        
+        if not os.path.exists(os.path.join(project_path, 'app')):
+            return f"❌ پروژه اندروید در {project_path} پیدا نشد"
+        
+        try:
+            os.chdir(project_path)
+            
+            if run_target == 'emulator':
+                print("📱 در حال اجرا روی شبیه‌ساز...")
+                result = subprocess.run(['./gradlew', 'installDebug'], 
+                                       capture_output=True, text=True, cwd=project_path)
+                
+                if result.returncode == 0:
+                    # پیدا کردن دستگاه متصل
+                    devices = subprocess.run(['adb', 'devices'], 
+                                           capture_output=True, text=True)
+                    
+                    if 'emulator' in devices.stdout:
+                        # اجرا روی شبیه‌ساز
+                        subprocess.Popen(['adb', 'shell', 'am', 'start', 
+                                         '-n', 'com.example.shiglapp/.MainActivity'])
+                        return "✅ برنامه روی شبیه‌ساز اجرا شد!"
+                    else:
+                        return "⚠️  شبیه‌ساز اندروید پیدا نشد. ابتدا شبیه‌ساز را اجرا کنید."
+                else:
+                    return f"❌ خطا در نصب روی شبیه‌ساز:\n{result.stderr}"
+            
+            elif run_target == 'device':
+                print("📱 در حال نصب روی دستگاه فیزیکی...")
+                result = subprocess.run(['./gradlew', 'installDebug'], 
+                                       capture_output=True, text=True, cwd=project_path)
+                
+                if result.returncode == 0:
+                    return "✅ برنامه روی دستگاه نصب شد!"
+                else:
+                    return f"❌ خطا در نصب روی دستگاه:\n{result.stderr}"
+            
+            else:
+                return "❌ هدف نامشخص. استفاده: run emulator یا run device"
+                
+        except Exception as e:
+            return f"❌ خطا در اجرا: {e}"
+    
+    def _cmd_activity(self, tokens: List[Token], pos: int) -> str:
+        """ایجاد Activity جدید"""
+        if pos + 1 >= len(tokens):
+            return "❌ فرمت: activity <name> [project_path]"
+        
+        activity_name = tokens[pos + 1].value
+        
+        # دریافت مسیر پروژه
+        if pos + 2 < len(tokens):
+            project_path = tokens[pos + 2].value
+        else:
+            project_path = os.getcwd()
+        
+        import os
+        
+        package_path = os.path.join(project_path, 'app', 'src', 'main', 'java', 'com', 'example')
+        
+        if not os.path.exists(package_path):
+            return "❌ پروژه اندروید پیدا نشد"
+        
+        # ایجاد فایل Activity
+        package_name = f"com.example.{os.path.basename(project_path).lower()}"
+        activity_content = f'''package {package_name};
+
+import android.os.Bundle;
+import android.widget.TextView;
+import androidx.appcompat.app.AppCompatActivity;
+
+public class {activity_name} extends AppCompatActivity {{
+    @Override
+    protected void onCreate(Bundle savedInstanceState) {{
+        super.onCreate(savedInstanceState);
+        setContentView(R.layout.activity_{activity_name.lower()});
+        
+        TextView textView = findViewById(R.id.textView);
+        textView.setText("Activity: {activity_name}");
+    }}
+}}
+'''
+        activity_path = os.path.join(package_path, f'{activity_name}.java')
+        with open(activity_path, 'w') as f:
+            f.write(activity_content)
+        
+        # ایجاد layout
+        layout_content = f'''<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:orientation="vertical"
+    android:gravity="center"
+    android:padding="16dp">
+
+    <TextView
+        android:id="@+id/textView"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="Activity: {activity_name}"
+        android:textSize="24sp"
+        android:textColor="#FF6200EE" />
+
+</LinearLayout>
+'''
+        layout_path = os.path.join(project_path, 'app', 'src', 'main', 'res', 'layout', f'activity_{activity_name.lower()}.xml')
+        with open(layout_path, 'w') as f:
+            f.write(layout_content)
+        
+        return f"""
+✅ Activity {activity_name} با موفقیت ایجاد شد!
+
+📁 فایل‌های ایجاد شده:
+  - {activity_path}
+  - {layout_path}
+
+🔧 برای استفاده در AndroidManifest.xml:
+  <activity android:name=".{activity_name}" />
+        """
+    
+    def _cmd_resource(self, tokens: List[Token], pos: int) -> str:
+        """مدیریت منابع (string, color, dimension)"""
+        if pos + 2 >= len(tokens):
+            return "❌ فرمت: resource <string|color|dimen> <name> <value> [project_path]"
+        
+        resource_type = tokens[pos + 1].value
+        resource_name = tokens[pos + 2].value
+        resource_value = tokens[pos + 3].value if pos + 3 < len(tokens) else ''
+        
+        # دریافت مسیر پروژه
+        if pos + 4 < len(tokens):
+            project_path = tokens[pos + 4].value
+        else:
+            project_path = os.getcwd()
+        
+        import os
+        
+        if resource_type == 'string':
+            strings_path = os.path.join(project_path, 'app', 'src', 'main', 'res', 'values', 'strings.xml')
+            
+            # خواندن فایل موجود
+            if os.path.exists(strings_path):
+                with open(strings_path, 'r') as f:
+                    content = f.read()
+                
+                # اضافه کردن رشته جدید
+                new_string = f'    <string name="{resource_name}">{resource_value}</string>\n'
+                content = content.replace('</resources>', new_string + '</resources>')
+                
+                with open(strings_path, 'w') as f:
+                    f.write(content)
+                
+                return f"✅ رشته {resource_name} = '{resource_value}' اضافه شد"
+        
+        return "❌ نوع منبع نامشخص. استفاده: resource string|color|dimen"
+    
+    def _cmd_manifest(self, tokens: List[Token], pos: int) -> str:
+        """ویرایش AndroidManifest.xml"""
+        if pos + 2 >= len(tokens):
+            return "❌ فرمت: manifest <permission|feature> <value> [project_path]"
+        
+        manifest_type = tokens[pos + 1].value
+        manifest_value = tokens[pos + 2].value
+        
+        # دریافت مسیر پروژه
+        if pos + 3 < len(tokens):
+            project_path = tokens[pos + 3].value
+        else:
+            project_path = os.getcwd()
+        
+        import os
+        
+        manifest_path = os.path.join(project_path, 'app', 'src', 'main', 'AndroidManifest.xml')
+        
+        if not os.path.exists(manifest_path):
+            return "❌ فایل AndroidManifest.xml پیدا نشد"
+        
+        with open(manifest_path, 'r') as f:
+            content = f.read()
+        
+        if manifest_type == 'permission':
+            permission = f'<uses-permission android:name="{manifest_value}" />'
+            content = content.replace('<manifest', f'<manifest\n    {permission}')
+            
+        elif manifest_type == 'feature':
+            feature = f'<uses-feature android:name="{manifest_value}" />'
+            content = content.replace('<application', f'{feature}\n    <application')
+        
+        with open(manifest_path, 'w') as f:
+            f.write(content)
+        
+        return f"✅ {manifest_type} {manifest_value} به AndroidManifest.xml اضافه شد"
+def _cmd_help(self, tokens: List[Token], pos: int) -> str:
+    """دستور help - به‌روزرسانی شده"""
+    return """
+📚 راهنمای SHIGL v1.0 (با پشتیبانی اندروید)
+
+دستورات پایه:
+  say "Hello"     - چاپ متن
+  var x = 10      - تعریف متغیر
+  ask name        - دریافت ورودی
+  time            - نمایش زمان
+
+عملیات ریاضی:
+  add x 5         - جمع
+  sub x 3         - تفریق
+  mul x 2         - ضرب
+  div x 4         - تقسیم
+
+شرط‌ها:
+  if x == 5       - بررسی برابری
+  if x > 10       - بررسی بزرگ‌تر
+
+مدیریت:
+  vars            - نمایش متغیرها
+  clear           - پاک کردن متغیرها
+  help            - نمایش راهنما
+
+🚀 **دستورات اندروید (جدید!):**
+  android create <name>     - ایجاد پروژه جدید اندروید
+  build apk [path]          - ساخت فایل APK
+  build aab [path]          - ساخت فایل AAB
+  run emulator [path]       - اجرا روی شبیه‌ساز
+  run device [path]         - اجرا روی دستگاه فیزیکی
+  activity <name> [path]    - ایجاد Activity جدید
+  resource string <name> <value> - اضافه کردن رشته
+  manifest permission <name> - اضافه کردن دسترسی
+
+📱 **مثال ساخت اپلیکیشن:**
+  android create MyApp
+  cd MyApp
+  build apk
+  run emulator
+"""
