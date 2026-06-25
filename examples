@@ -206,3 +206,18 @@ SHIGL> android create TestApp
 SHIGL> cd TestApp
 SHIGL> build apk
 SHIGL> run emulator
+# 1. ذخیره کد کامپایلر
+nano shigl_compiler.py
+# (کد بالا رو کپی کن)
+
+# 2. ذخیره برنامه نمونه
+nano test.shigl
+# (کد بالا رو کپی کن)
+
+# 3. اجرا
+python shigl_compiler.py
+
+# 4. وقتی ازت پرسید:
+📁 نام فایل SHIGL: test.shigl
+
+# 5. خروجی در پوشه android_output/ ساخته میشه
