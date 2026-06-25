@@ -1517,3 +1517,57 @@ def main():
 
 if __name__ == "__main__":
     main()
+// ============================================
+// اولین برنامه SHIGL - اپلیکیشن اندروید
+// ============================================
+
+// ---------- متغیرها و داده ----------
+var appName = "MyFirstApp"
+var version = 1.0
+var isActive = true
+
+// ---------- تابع اصلی ----------
+func main() {
+    say "Starting " + appName
+    say "Version: " + version
+    
+    // شرط
+    if isActive == true {
+        say "App is active!"
+    } else {
+        say "App is inactive!"
+    }
+    
+    // حلقه
+    for i in 1..5 {
+        say "Count: " + i
+    }
+    
+    // فراخوانی تابع
+    greet("Erfan")
+}
+
+// ---------- تابع با پارامتر ----------
+func greet(name) {
+    say "Hello " + name + "!"
+}
+
+// ---------- خروجی اندروید ----------
+android app "MyFirstApp" {
+    package "com.example.myfirstapp"
+    minSdk 21
+    targetSdk 34
+    
+    activity "MainActivity" {
+        layout "activity_main"
+        text "Hello from SHIGL!"
+        button "Click Me" {
+            onClick {
+                say "Button clicked!"
+            }
+        }
+    }
+    
+    permission "INTERNET"
+    permission "ACCESS_NETWORK_STATE"
+}
