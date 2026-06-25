@@ -1,0 +1,34 @@
+// ============================================
+// اولین برنامه SHIGL
+// ============================================
+
+var appName = "MyFirstApp"
+var version = 1.0
+
+func main() {
+    say "Starting " + appName
+    say "Version: " + version
+    
+    for i in 1..5 {
+        say "Count: " + i
+    }
+    
+    if version > 0 {
+        say "App is running!"
+    }
+}
+
+// خروجی اندروید
+android app "MyFirstApp" {
+    package "com.example.myfirstapp"
+    minSdk 21
+    targetSdk 34
+    
+    activity "MainActivity" {
+        layout "activity_main"
+        text "Hello from SHIGL!"
+        button "Click Me"
+    }
+    
+    permission "INTERNET"
+}
