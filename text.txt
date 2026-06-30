@@ -1,7 +1,13 @@
-روش دستور
-Python مستقیم python shigl_cli.py examples/hello.shigl
-Python با مسیر کامل python3 /path/to/SHIGL_V2/shigl_cli.py examples/hello.shigl
-بعد از نصب shigl examples/hello.shigl
-با bash script ./shigl.sh examples/hello.shigl
-با Makefile make run
-با Docker docker run --rm shigl examples/hello.shigl
+# ۱. نصب پیش‌نیازها
+pkg update && pkg upgrade
+pkg install python git
+
+# ۲. کلون کردن پروژه (یا کپی فایل‌ها)
+git clone https://github.com/Erfanshirani6/SHIGL.git
+cd SHIGL
+
+# ۳. اجرا
+python shigl_cli.py examples/hello.shigl
+
+# ۴. نتیجه: فایل‌های اندروید در پوشه android_output
+ls -la android_output/
