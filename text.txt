@@ -1,0 +1,7 @@
+روش دستور
+Python مستقیم python shigl_cli.py examples/hello.shigl
+Python با مسیر کامل python3 /path/to/SHIGL_V2/shigl_cli.py examples/hello.shigl
+بعد از نصب shigl examples/hello.shigl
+با bash script ./shigl.sh examples/hello.shigl
+با Makefile make run
+با Docker docker run --rm shigl examples/hello.shigl
