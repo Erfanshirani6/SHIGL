@@ -221,3 +221,30 @@ python shigl_compiler.py
 📁 نام فایل SHIGL: test.shigl
 
 # 5. خروجی در پوشه android_output/ ساخته میشه
+
+
+// sample.shigl - اولین برنامه SHIGL 2.0
+
+let appName = "SHIGL Demo"
+let version = 1.0
+
+fn main() {
+    print("Starting " + appName)
+    print("Version: " + version)
+    
+    let names = ["Ali", "Sara", "Reza"]
+    for name in names {
+        print("Hello " + name)
+    }
+}
+
+android app appName {
+    package = "com.shigl.demo"
+    versionCode = 1
+    versionName = "1.0"
+    
+    activity "MainActivity" {
+        layout = "activity_main"
+        label = "SHIGL Demo"
+    }
+}
