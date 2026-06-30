@@ -1,4 +1,14 @@
-# SHIGL Language
+# رفتن به پوشه پروژه
+cd SHIGL_V2
+
+# نصب به صورت editable (برای توسعه)
+pip install -e .
+
+# یا نصب کامل
+pip install .
+
+# نصب با pip3
+pip3 install -e .# SHIGL Language
 
 SHIGL is a simple programming language created for learning and experimentation.
 
