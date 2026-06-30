@@ -1,0 +1,8 @@
+# رفتن به پوشه پروژه
+cd SHIGL_V2
+
+# اجرا با python
+python shigl_cli.py examples/hello.shigl
+
+# یا python3 (در بعضی سیستم‌ها)
+python3 shigl_cli.py examples/hello.shigl
