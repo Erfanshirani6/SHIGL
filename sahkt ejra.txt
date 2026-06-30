@@ -1,0 +1,8 @@
+# ساخت ایمیج
+docker build -t shigl .
+
+# اجرا
+docker run --rm shigl examples/hello.shigl
+
+# اجرا با دسترسی به پوشه فعلی
+docker run --rm -v $(pwd):/app shigl examples/hello.shigl

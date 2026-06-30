@@ -1,0 +1,1 @@
+./shigl.sh examples/hello.shigl

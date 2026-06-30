@@ -1,0 +1,19 @@
+# Makefile
+.PHONY: run build clean install
+
+run:
+	python3 shigl_cli.py examples/hello.shigl
+
+build:
+	python3 shigl_cli.py examples/hello.shigl
+
+install:
+	pip install -e .
+
+clean:
+	rm -rf android_output/
+	find . -type d -name "__pycache__" -exec rm -rf {} +
+	find . -type f -name "*.pyc" -delete
+
+test:
+	python3 -m pytest tests/

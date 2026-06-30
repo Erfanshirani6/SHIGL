@@ -1,0 +1,5 @@
+# حالا می‌توانید از هر جایی اجرا کنید
+shigl examples/hello.shigl
+
+# یا با python
+python -m shigl_cli examples/hello.shigl
