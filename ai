@@ -1,1 +1,42 @@
+// ============================================
+// SHIGL AI Center - نمونه کد
+// ============================================
 
+// -------- AI Commands --------
+ai think "چگونه می‌توانم یک اپلیکیشن اندروید با SHIGL بسازم؟"
+
+ai plan "ساخت یک اپلیکیشن یادگیری زبان با هوش مصنوعی"
+
+ai execute "یک فایل README.md برای پروژه SHIGL بنویس"
+
+ai learn "کاربر از من پرسید که چطور می‌تواند از SHIGL برای ساخت وب‌سایت استفاده کند"
+
+ai reflect "چه چیزهایی از تعاملات امروز یاد گرفتم؟"
+
+// -------- Network Commands --------
+network start
+network discover
+network send "node-2" {
+    type: "query"
+    query: "وضعیت پردازش شما چیست؟"
+}
+
+// -------- GitHub Commands --------
+github connect "Erfanshirani6/SHIGL"
+github search "SHIGL compiler python"
+github create-pr "SHIGL" {
+    title: "Add AI features"
+    body: "This PR adds AI capabilities to SHIGL"
+    head: "feature/ai"
+    base: "main"
+}
+github fix-bug "SHIGL" {
+    file: "shigl/parser.py"
+    issue: "Parser fails on nested functions"
+}
+
+// -------- ترکیبی --------
+ai think "تحلیل کن پروژه SHIGL چه مشکلاتی دارد و راه‌حل بده"
+github connect "Erfanshirani6/SHIGL"
+github search "issues"
+ai plan "رفع تمام Issues باز پروژه SHIGL"
