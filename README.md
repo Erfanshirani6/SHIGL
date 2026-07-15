@@ -268,3 +268,19 @@ python shigl.py
 │    🌐 WebAssembly                         │
 │    💻 Native Executable                   │
 └─────────────────────────────────────────────┘
+___
+# SHIGL AI Center 🧠
+
+SHIGL is now an **Autonomous AI Center** with:
+
+- **Local LLM** - Run AI models offline
+- **Intelligent Agent** - Think, plan, execute, learn
+- **Mesh Network** - Connect with other SHIGL nodes
+- **GitHub Integration** - Auto-fix bugs, create PRs, search code
+- **Android Output** - Generate complete Android apps
+
+## Quick Start
+
+```bash
+pip install -e .
+shigl examples/ai_demo.shigl
