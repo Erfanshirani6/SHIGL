@@ -1,0 +1,23 @@
+# SHIGL AI Center Dependencies
+
+# Core
+pyyaml>=6.0
+requests>=2.31.0
+
+# AI & LLM
+llama-cpp-python>=0.2.0
+chromadb>=0.4.0
+sentence-transformers>=2.2.0
+
+# Agent Framework
+agent-framework>=1.0.0b251007
+
+# Network
+Pyro5>=5.17
+websockets>=12.0
+
+# GitHub
+githubkit>=0.13.0
+
+# Utils
+python-dotenv>=1.0.0
